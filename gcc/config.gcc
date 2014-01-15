@@ -2541,6 +2541,13 @@ spu-*-elf*)
 	c_target_objs="${c_target_objs} spu-c.o"
 	cxx_target_objs="${cxx_target_objs} spu-c.o"
 	;;
+tic6x-*-coff)
+	tm_file="c6x/coff.h"
+#	tm_file="elfos.h ${tm_file} c6x/elf-common.h c6x/elf.h"
+#	tm_file="${tm_file} dbxelf.h tm-dwarf2.h newlib-stdint.h"
+#	tmake_file="c6x/t-c6x c6x/t-c6x-elf"
+	use_collect2=no
+	;;
 tic6x-*-elf)
 	tm_file="elfos.h ${tm_file} c6x/elf-common.h c6x/elf.h"
 	tm_file="${tm_file} dbxelf.h tm-dwarf2.h newlib-stdint.h"
