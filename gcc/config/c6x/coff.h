@@ -24,7 +24,7 @@
    the linker seems to want the alignment of data objects
    to depend on their types.  We do exactly that here.  */
 
-#define COMMON_ASM_OP	"\tgcc/config/c6x/coff.h: COMMON_ASM_OP\n\t.comm\t"
+#define COMMON_ASM_OP	"\t;; gcc/config/c6x/coff.h: COMMON_ASM_OP\n\t.comm\t"
 
 /* The following macro defines the format used to output the second
    operand of the .type assembler directive.  Different svr4 assemblers
@@ -40,8 +40,8 @@
    different pseudo-op names for these, they may be overridden in the
    file which includes this one.  */
 
-#define TYPE_ASM_OP	"\tgcc/config/c6x/coff.h: TYPE_ASM_OP\n\t.type\t"
-#define SIZE_ASM_OP	"\tgcc/config/c6x/coff.h: SIZE_ASM_OP\n\t.size\t"
+#define TYPE_ASM_OP	"\t;; gcc/config/c6x/coff.h: TYPE_ASM_OP\n\t.type\t"
+#define SIZE_ASM_OP	"\t;; gcc/config/c6x/coff.h: SIZE_ASM_OP\n\t.size\t"
 
 
 /* Write the extra assembler code needed to declare a function's result.
@@ -55,10 +55,11 @@
 /* This is how to allocate empty space in some section.  The .zero
    pseudo-op is used for this on most svr4 assemblers.  */
 
-#define SKIP_ASM_OP	"\tgcc/config/c6x/coff.h: SKIP_ASM_OP\n\t.zero\t"
+#define SKIP_ASM_OP	"\t;; gcc/config/c6x/coff.h: SKIP_ASM_OP\n\t.zero\t"
 
 #undef  ASM_OUTPUT_SKIP
 #define ASM_OUTPUT_SKIP(FILE, SIZE) \
    fprintf ((FILE), "%s"HOST_WIDE_INT_PRINT_UNSIGNED"\n",\
 	    SKIP_ASM_OP, (SIZE))
 
+#define TARGET_ASM_NAMED_SECTION  default_coff_asm_named_section
