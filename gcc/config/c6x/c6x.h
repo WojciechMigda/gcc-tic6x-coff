@@ -466,6 +466,11 @@ struct GTY(()) machine_function
   (((code) == 0 && (data) == 1) ? (DW_EH_PE_datarel | DW_EH_PE_indirect) \
 				: DW_EH_PE_absptr)
 
+#ifdef OBJECT_FORMAT_COFF
+#undef ASM_OUTPUT_TYPE_DIRECTIVE
+#define ASM_OUTPUT_TYPE_DIRECTIVE(a, b, c)
+#endif
+
 /* This should be the same as the definition in elfos.h, plus the call
    to output special unwinding directives.  */
 #undef ASM_DECLARE_FUNCTION_NAME
