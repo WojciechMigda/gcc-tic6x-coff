@@ -1,3 +1,5 @@
+#define OBJECT_FORMAT_COFF
+
 /* This is how to store into the string LABEL
    the symbol_ref name of an internal numbered label where
    PREFIX is the class of label and NUM is the number within the class.
