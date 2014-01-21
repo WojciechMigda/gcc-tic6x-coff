@@ -22,6 +22,8 @@
 #ifndef GCC_C6X_H
 #define GCC_C6X_H
 
+#define OBJECT_FORMAT_HYBRID
+
 /* Feature bit definitions that enable specific insns.  */
 #define C6X_INSNS_C62X		1
 #define C6X_INSNS_C64X		2
@@ -365,7 +367,7 @@ struct c6x_args {
 /* Trampolines.  */
 #define TRAMPOLINE_SIZE 32
 #define TRAMPOLINE_ALIGNMENT 256
-
+
 #define ELIMINABLE_REGS					\
 {{ ARG_POINTER_REGNUM, STACK_POINTER_REGNUM},		\
  { ARG_POINTER_REGNUM, HARD_FRAME_POINTER_REGNUM},	\
@@ -377,7 +379,7 @@ struct c6x_args {
 
 #define INITIAL_ELIMINATION_OFFSET(FROM, TO, OFFSET) \
   ((OFFSET) = c6x_initial_elimination_offset ((FROM), (TO)))
-
+
 /* Addressing Modes.  */
 
 #define CONSTANT_ADDRESS_P(x) (CONSTANT_P(x) && GET_CODE(x) != CONST_DOUBLE)
@@ -395,13 +397,13 @@ struct c6x_args {
 
 #define LEGITIMATE_PIC_OPERAND_P(X) \
   (!symbolic_operand (X, SImode))
-
+
 struct GTY(()) machine_function
 {
   /* True if we expanded a sibling call.  */
   int contains_sibcall;
 };
-
+
 /* Costs.  */
 #define NO_FUNCTION_CSE 1
 
@@ -409,7 +411,7 @@ struct GTY(()) machine_function
 
 #define BRANCH_COST(speed_p, predictable_p) 6
 
-
+
 /* Model costs for the vectorizer.  */
 
 /* Cost of conditional branch.  */
