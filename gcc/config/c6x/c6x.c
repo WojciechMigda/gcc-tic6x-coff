@@ -85,7 +85,7 @@ static rtx c6x_current_insn = NULL_RTX;
 
 /* A decl we build to access __c6xabi_DSBT_base.  */
 static GTY(()) tree dsbt_decl;
-
+
 /* Determines whether we run our final scheduling pass or not.  We always
    avoid the normal second scheduling pass.  */
 static int c6x_flag_schedule_insns2;
@@ -99,7 +99,7 @@ static int c6x_flag_modulo_sched;
 
 /* Record the state of flag_pic before we set it to 1 for DSBT.  */
 int c6x_initial_flag_pic;
-
+
 typedef struct
 {
   /* We record the clock cycle for every insn during scheduling.  */
@@ -181,7 +181,7 @@ enum unitreqs
    iteration intervals.  */
 typedef int unit_req_table[2][UNIT_REQ_MAX];
 static unit_req_table unit_reqs;
-
+
 /* Register map for debugging.  */
 unsigned const dbx_register_map[FIRST_PSEUDO_REGISTER] =
 {
@@ -194,7 +194,7 @@ unsigned const dbx_register_map[FIRST_PSEUDO_REGISTER] =
   66, 67, 68,
   -1, -1, -1						/* FP, ARGP, ILC.  */
 };
-
+
 /* Allocate a new, cleared machine_function structure.  */
 
 static struct machine_function *
@@ -263,7 +263,7 @@ c6x_conditional_register_usage (void)
 			  REG_A0);
     }
 }
-
+
 static GTY(()) rtx eqdf_libfunc;
 static GTY(()) rtx nedf_libfunc;
 static GTY(()) rtx ledf_libfunc;
@@ -391,6 +391,7 @@ c6x_file_start (void)
   default_file_start ();
 
   /* Arrays are aligned to 8-byte boundaries.  */
+#ifndef OBJECT_FORMAT_HYBRID
   asm_fprintf (asm_out_file,
 	       "\t.c6xabi_attribute Tag_ABI_array_object_alignment, 0\n");
   asm_fprintf (asm_out_file,
@@ -410,6 +411,14 @@ c6x_file_start (void)
   /* We conform to version 1.0 of the ABI.  */
   asm_fprintf (asm_out_file,
 	       "\t.c6xabi_attribute Tag_ABI_conformance, \"1.0\"\n");
+#else
+  asm_fprintf (asm_out_file,
+           "\t.battr \"TI\", Tag_File, 1, Tag_ABI_stack_align_needed(0)\n");
+  asm_fprintf (asm_out_file,
+           "\t.battr \"TI\", Tag_File, 1, Tag_ABI_stack_align_preserved(0)\n");
+  asm_fprintf (asm_out_file,
+           "\t.battr \"TI\", Tag_File, 1, Tag_Tramps_Use_SOC(1)\n");
+#endif
 
 }
 
@@ -458,7 +467,7 @@ c6x_output_fn_unwind (FILE * f)
   fputs ("\t.endp\n", f);
 }
 
-
+
 /* Stack and Calling.  */
 
 int argument_registers[10] =
@@ -682,7 +691,7 @@ c6x_build_builtin_va_list (void)
 {
   return build_pointer_type (char_type_node);
 }
-
+
 static void
 c6x_asm_trampoline_template (FILE *f)
 {
@@ -737,7 +746,7 @@ c6x_initialize_trampoline (rtx tramp, tree fndecl, rtx cxt)
 		     Pmode);
 #endif
 }
-
+
 /* Determine whether c6x_output_mi_thunk can succeed.  */
 
 static bool
@@ -843,7 +852,7 @@ c6x_output_mi_thunk (FILE *file ATTRIBUTE_UNUSED,
       output_asm_insn ("add .d1 %2, %1, %2", xops);
     }
 }
-
+
 /* Return true if EXP goes in small data/bss.  */
 
 static bool
@@ -1073,7 +1082,7 @@ c6x_section_type_flags (tree decl, const char *name, int reloc)
 
   return flags;
 }
-
+
 /* Checks whether the given CALL_EXPR would use a caller saved
    register.  This is used to decide whether sibling call optimization
    could be performed on the respective function call.  */
@@ -1820,7 +1829,7 @@ c6x_expand_movmem (rtx dst, rtx src, rtx count_exp, rtx align_exp,
     }
   return true;
 }
-
+
 /* Subroutine of print_address_operand, print a single address offset OFF for
    a memory access of mode MEM_MODE, choosing between normal form and scaled
    form depending on the type of the insn.  Misaligned memory references must
@@ -2295,7 +2304,7 @@ c6x_print_operand (FILE *file, rtx x, int code)
 	}
     }
 }
-
+
 /* Return TRUE if OP is a valid memory address with a base register of
    class C.  If SMALL_OFFSET is true, we disallow memory references which would
    require a long offset with B14/B15.  */
@@ -2466,7 +2475,7 @@ c6x_legitimate_constant_p (enum machine_mode mode ATTRIBUTE_UNUSED,
 {
   return true;
 }
-
+
 /* Implements TARGET_PREFERRED_RENAME_CLASS.  */
 static reg_class_t
 c6x_preferred_rename_class (reg_class_t cl)
@@ -2479,7 +2488,7 @@ c6x_preferred_rename_class (reg_class_t cl)
     return NONPREDICATE_REGS;
   return NO_REGS;
 }
-
+
 /* Implements FINAL_PRESCAN_INSN.  */
 void
 c6x_final_prescan_insn (rtx insn, rtx *opvec ATTRIBUTE_UNUSED,
@@ -2487,7 +2496,7 @@ c6x_final_prescan_insn (rtx insn, rtx *opvec ATTRIBUTE_UNUSED,
 {
   c6x_current_insn = insn;
 }
-
+
 /* A structure to describe the stack layout of a function.  The layout is
    as follows:
 
@@ -2960,7 +2969,7 @@ c6x_return_addr_rtx (int count)
 
   return get_hard_reg_initial_val (Pmode, RETURN_ADDR_REGNO);
 }
-
+
 /* Return true iff TYPE is one of the shadow types.  */
 static bool
 shadow_type_p (enum attr_type type)
@@ -2988,7 +2997,7 @@ shadow_or_blockage_p (rtx insn)
   type = get_attr_type (insn);
   return shadow_type_p (type) || type == TYPE_BLOCKAGE;
 }
-
+
 /* Translate UNITS into a bitmask of units we can reserve for this
    insn.  */
 static int
@@ -3575,7 +3584,7 @@ reshuffle_units (basic_block loop)
     }
   regrename_finish ();
 }
-
+
 /* Backend scheduling state.  */
 typedef struct c6x_sched_context
 {
@@ -4577,7 +4586,7 @@ c6x_adjust_cost (rtx insn, rtx link, rtx dep_insn, int cost)
 
   return cost - shadow_bonus;
 }
-
+
 /* Create a SEQUENCE rtx to replace the instructions in SLOT, of which there
    are N_FILLED.  REAL_FIRST identifies the slot if the insn that appears
    first in the original stream.  */
@@ -5995,7 +6004,7 @@ c6x_function_end (FILE *file, const char *fname)
   if (!flag_inhibit_size_directive)
     ASM_OUTPUT_MEASURED_SIZE (file, fname);
 }
-
+
 /* Determine whether X is a shift with code CODE and an integer amount
    AMOUNT.  */
 static bool
@@ -6332,7 +6341,7 @@ c6x_dwarf_register_span (rtx rtl)
 
     return p;
 }
-
+
 /* Codes for all the C6X builtins.  */
 enum c6x_builtins
 {
@@ -6412,7 +6421,7 @@ c6x_init_builtins (void)
   tree v2si_ftype_v2hi_v2hi
     = build_function_type_list (V2SI_type_node, V2HI_type_node,
 				V2HI_type_node, NULL_TREE);
-  
+
   def_builtin ("__builtin_c6x_sadd", int_ftype_int_int,
 	       C6X_BUILTIN_SADD);
   def_builtin ("__builtin_c6x_ssub", int_ftype_int_int,
@@ -6675,7 +6684,7 @@ c6x_debug_unwind_info (void)
 
   return default_debug_unwind_info ();
 }
-
+
 /* Target Structure.  */
 
 /* Initialize the GCC target structure.  */
