@@ -36,6 +36,9 @@ static inline void noop_asm_output_ident_directive (const char *ident_str ATTRIB
 #undef TARGET_ASM_OUTPUT_IDENT
 #define TARGET_ASM_OUTPUT_IDENT noop_asm_output_ident_directive
 
+#undef COMMON_ASM_OP
+#define COMMON_ASM_OP   ".far"
+
 #endif
 
 /* Feature bit definitions that enable specific insns.  */
@@ -571,20 +574,46 @@ do { char __buf[256];					\
    : c6x_sdata_mode == C6X_SDATA_ALL ? true	\
    : !AGGREGATE_TYPE_P (TREE_TYPE (EXP)))
 
+#ifndef OBJECT_FORMAT_HYBRID
 #define SCOMMON_ASM_OP "\t.scomm\t"
+#else
+#define SCOMMON_ASM_OP "\t.bss\t"
+#endif
 
 #undef  ASM_OUTPUT_ALIGNED_DECL_COMMON
+#ifndef OBJECT_FORMAT_HYBRID
+#define ASM_OUTPUT_ALIGNED_DECL_COMMON(FILE, DECL, NAME, SIZE, ALIGN)   \
+  do                                    \
+    {                                   \
+      if (DECL != NULL && PLACE_IN_SDATA_P (DECL))          \
+    fprintf ((FILE), "%s", SCOMMON_ASM_OP);             \
+      else                              \
+    fprintf ((FILE), "%s", COMMON_ASM_OP);              \
+      assemble_name ((FILE), (NAME));                   \
+      fprintf ((FILE), ",%u,%u\n", (int)(SIZE), (ALIGN) / BITS_PER_UNIT);\
+    }                                   \
+  while (0)
+#else
 #define ASM_OUTPUT_ALIGNED_DECL_COMMON(FILE, DECL, NAME, SIZE, ALIGN)	\
   do									\
     {									\
+      fprintf ((FILE), "\t.global ");\
+      assemble_name ((FILE), (NAME));                   \
+      fprintf ((FILE), "\n");				\
       if (DECL != NULL && PLACE_IN_SDATA_P (DECL))			\
-	fprintf ((FILE), "%s", SCOMMON_ASM_OP);				\
+      { \
+          fprintf ((FILE), "%s", SCOMMON_ASM_OP);				\
+          assemble_name ((FILE), (NAME));                   \
+      } \
       else								\
-	fprintf ((FILE), "%s", COMMON_ASM_OP);				\
-      assemble_name ((FILE), (NAME));					\
+      { \
+          assemble_name ((FILE), (NAME));                   \
+          fprintf ((FILE), ":\t.usect \"%s\"", COMMON_ASM_OP);             \
+      } \
       fprintf ((FILE), ",%u,%u\n", (int)(SIZE), (ALIGN) / BITS_PER_UNIT);\
     }									\
   while (0)
+#endif
 
 /* This says how to output assembler code to declare an
    uninitialized internal linkage data object.  */
