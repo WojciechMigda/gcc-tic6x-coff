@@ -26,18 +26,31 @@
 
 #ifdef OBJECT_FORMAT_HYBRID
 
-static inline void noop_asm_output_ident_directive (const char *ident_str ATTRIBUTE_UNUSED){}
-
-/* .type */
-#undef ASM_OUTPUT_TYPE_DIRECTIVE
-#define ASM_OUTPUT_TYPE_DIRECTIVE(STREAM, NAME, TYPE)
-
-/* .ident */
 #undef TARGET_ASM_OUTPUT_IDENT
-#define TARGET_ASM_OUTPUT_IDENT noop_asm_output_ident_directive
+#define TARGET_ASM_OUTPUT_IDENT hook_void_constcharptr
 
 #undef COMMON_ASM_OP
 #define COMMON_ASM_OP   ".far"
+
+#define HOOK_NOOP do {} while(0)
+
+#undef SIZE_ASM_OP
+#define ASM_OUTPUT_SIZE_DIRECTIVE(STREAM, NAME, SIZE) HOOK_NOOP
+#define ASM_OUTPUT_MEASURED_SIZE(STREAM, NAME) HOOK_NOOP
+
+#undef TYPE_ASM_OP
+#define ASM_OUTPUT_TYPE_DIRECTIVE(STREAM, NAME, TYPE) HOOK_NOOP
+
+#undef ASM_WEAKEN_LABEL
+
+#undef ASM_OUTPUT_EXTERNAL
+#define ASM_OUTPUT_EXTERNAL(FILE, DECL, NAME) \
+  do { \
+    c6x_coff_asm_output_external (FILE, DECL, NAME); \
+  } while(0)
+
+void
+c6x_coff_asm_output_external (FILE *file, tree decl, const char *name);
 
 #endif
 
@@ -501,12 +514,8 @@ struct GTY(()) machine_function
 /* This should be the same as the definition in elfos.h, plus the call
    to output special unwinding directives.  */
 #undef ASM_DECLARE_FUNCTION_SIZE
-#ifndef OBJECT_FORMAT_HYBRID
 #define ASM_DECLARE_FUNCTION_SIZE(STREAM, NAME, DECL) \
   c6x_function_end (STREAM, NAME)
-#else
-#define ASM_DECLARE_FUNCTION_SIZE(STREAM, NAME, DECL)
-#endif
 
 /* Arbitrarily choose A4/A5.  */
 #define EH_RETURN_DATA_REGNO(N) (((N) < 2) ? (N) + 4 : INVALID_REGNUM)
@@ -597,7 +606,7 @@ do { char __buf[256];					\
 #define ASM_OUTPUT_ALIGNED_DECL_COMMON(FILE, DECL, NAME, SIZE, ALIGN)	\
   do									\
     {									\
-      fprintf ((FILE), "\t.global ");\
+      fprintf ((FILE), GLOBAL_ASM_OP);\
       assemble_name ((FILE), (NAME));                   \
       fprintf ((FILE), "\n");				\
       if (DECL != NULL && PLACE_IN_SDATA_P (DECL))			\
