@@ -2035,6 +2035,7 @@ assemble_variable (tree decl, int top_level ATTRIBUTE_UNUSED,
     assemble_noswitch_variable (decl, name, sect);
   else
     {
+#ifndef OBJECT_FORMAT_HYBRID
       switch_to_section (sect);
       if (DECL_ALIGN (decl) > BITS_PER_UNIT)
 	ASM_OUTPUT_ALIGN (asm_out_file, floor_log2 (DECL_ALIGN_UNIT (decl)));
@@ -2045,6 +2046,34 @@ assemble_variable (tree decl, int top_level ATTRIBUTE_UNUSED,
 	    = tree_low_cst (DECL_SIZE_UNIT (decl), 1);
 	  assemble_zeros (asan_red_zone_size (size));
 	}
+#else
+      /* !!! HACK AHEAD !!! */
+      unsigned HOST_WIDE_INT int size = tree_low_cst (DECL_SIZE_UNIT (decl), 1);
+
+      fprintf(asm_out_file, "\t.sect\t\".cinit\"\n\t.align\t8\n");
+      fprintf(asm_out_file, "\t.field\t%ld,32\n", size);
+      fprintf(asm_out_file, "\t.field\t");
+      assemble_name(asm_out_file, name);
+      fprintf(asm_out_file, ",32\n");
+      if (!dont_output_data)
+      {
+        if (DECL_INITIAL (decl)
+          && DECL_INITIAL (decl) != error_mark_node
+          && !initializer_zerop (DECL_INITIAL (decl)))
+        {
+          /* Output the actual data.  */
+          output_constant (DECL_INITIAL (decl),
+            tree_low_cst (DECL_SIZE_UNIT (decl), 1),
+            DECL_ALIGN (decl));
+        }
+        else
+        {
+          /* Leave space for it.  */
+          assemble_zeros (tree_low_cst (DECL_SIZE_UNIT (decl), 1));
+        }
+      }
+      ASM_OUTPUT_ALIGNED_DECL_COMMON(asm_out_file, decl, name, size, DECL_ALIGN (decl));
+#endif
     }
 }
 

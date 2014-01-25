@@ -617,7 +617,7 @@ do { char __buf[256];					\
       else								\
       { \
           assemble_name ((FILE), (NAME));                   \
-          fprintf ((FILE), ":\t.usect \"%s\"", COMMON_ASM_OP);             \
+          fprintf ((FILE), ":\t.usect\t\"%s\"", COMMON_ASM_OP);             \
       } \
       fprintf ((FILE), ",%u,%u\n", (int)(SIZE), (ALIGN) / BITS_PER_UNIT);\
     }									\
