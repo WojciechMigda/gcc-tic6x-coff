@@ -32,6 +32,9 @@
 #undef COMMON_ASM_OP
 #define COMMON_ASM_OP   ".far"
 
+#undef SKIP_ASM_OP
+#define SKIP_ASM_OP     "\t.field\t0, 8 * "
+
 #define HOOK_NOOP do {} while(0)
 
 #undef SIZE_ASM_OP
