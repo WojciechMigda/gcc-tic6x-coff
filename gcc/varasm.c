@@ -2072,7 +2072,21 @@ assemble_variable (tree decl, int top_level ATTRIBUTE_UNUSED,
           assemble_zeros (tree_low_cst (DECL_SIZE_UNIT (decl), 1));
         }
       }
-      ASM_OUTPUT_ALIGNED_DECL_COMMON(asm_out_file, decl, name, size, DECL_ALIGN (decl));
+      if (DECL_SECTION_NAME (decl) != NULL)
+      {
+        const char *section_name = TREE_STRING_POINTER (DECL_SECTION_NAME (decl));
+
+        fprintf (asm_out_file, GLOBAL_ASM_OP);
+        assemble_name (asm_out_file, name);
+        fprintf (asm_out_file, "\n");
+        assemble_name (asm_out_file, name);
+        fprintf (asm_out_file, ":\t.usect\t\"%s\"", section_name);
+        fprintf (asm_out_file, ",%u,%u\n", (int)size, DECL_ALIGN (decl) / BITS_PER_UNIT);
+      }
+      else
+      {
+        ASM_OUTPUT_ALIGNED_DECL_COMMON(asm_out_file, decl, name, size, DECL_ALIGN (decl));
+      }
 #endif
     }
 }
