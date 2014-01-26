@@ -2087,6 +2087,7 @@ assemble_variable (tree decl, int top_level ATTRIBUTE_UNUSED,
       {
         ASM_OUTPUT_ALIGNED_DECL_COMMON(asm_out_file, decl, name, size, DECL_ALIGN (decl));
       }
+      fputs("", asm_out_file);
 #endif
     }
 }

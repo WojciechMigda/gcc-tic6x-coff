@@ -57,7 +57,7 @@
 void
 c6x_coff_asm_output_external (FILE *file, tree decl, const char *name);
 
-#endif
+#endif /* OBJECT_FORMAT_HYBRID */
 
 /* Feature bit definitions that enable specific insns.  */
 #define C6X_INSNS_C62X		1

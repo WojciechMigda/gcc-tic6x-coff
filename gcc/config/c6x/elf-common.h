@@ -30,7 +30,11 @@
 #undef DATA_SECTION_ASM_OP
 #define DATA_SECTION_ASM_OP "\t.section\t\".fardata\",\"aw\""
 #undef READONLY_DATA_SECTION_ASM_OP
+#ifndef OBJECT_FORMAT_HYBRID
 #define READONLY_DATA_SECTION_ASM_OP "\t.section\t\".const\",\"a\",@progbits"
+#else
+#define READONLY_DATA_SECTION_ASM_OP "\t.sect\t\".const\""
+#endif
 #define BSS_SECTION_ASM_OP "\t.section\t\".far\",\"aw\",@nobits"
 #define SDATA_SECTION_ASM_OP "\t.section\t\".neardata\",\"aw\""
 #define SBSS_SECTION_ASM_OP "\t.section\t\".bss\",\"aw\",@nobits"
