@@ -26,6 +26,8 @@
 
 #ifdef OBJECT_FORMAT_HYBRID
 
+#undef PCC_BITFIELD_TYPE_MATTERS
+
 #undef TARGET_ASM_OUTPUT_IDENT
 #define TARGET_ASM_OUTPUT_IDENT hook_void_constcharptr
 
