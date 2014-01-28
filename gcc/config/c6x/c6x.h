@@ -26,6 +26,10 @@
 
 #ifdef OBJECT_FORMAT_HYBRID
 
+/* This doesn't work. Still, I'll leave it here for reference */
+#undef TARGET_HAVE_SWITCHABLE_BSS_SECTIONS
+#define TARGET_HAVE_SWITCHABLE_BSS_SECTIONS false
+
 #undef PCC_BITFIELD_TYPE_MATTERS
 
 #undef TARGET_ASM_OUTPUT_IDENT
@@ -35,7 +39,7 @@
 #define COMMON_ASM_OP   ".far"
 
 #undef SKIP_ASM_OP
-#define SKIP_ASM_OP     "\t.field\t0, 8 * "
+#define SKIP_ASM_OP     "\t.space\t"
 
 #define HOOK_NOOP do {} while(0)
 
@@ -45,6 +49,9 @@
 
 #undef TYPE_ASM_OP
 #define ASM_OUTPUT_TYPE_DIRECTIVE(STREAM, NAME, TYPE) HOOK_NOOP
+
+#undef STRING_ASM_OP
+#define STRING_ASM_OP "\t.cstring\t"
 
 #undef ASM_WEAKEN_LABEL
 
@@ -562,8 +569,8 @@ extern unsigned const dbx_register_map[FIRST_PSEUDO_REGISTER];
 
 #define FINAL_PRESCAN_INSN c6x_final_prescan_insn
 
-#define TEXT_SECTION_ASM_OP ".text;"
-#define DATA_SECTION_ASM_OP ".data;"
+#define TEXT_SECTION_ASM_OP "\t.text"
+#define DATA_SECTION_ASM_OP "\t.data"
 
 #define ASM_OUTPUT_ALIGN(stream, power)			    \
   do							    \
