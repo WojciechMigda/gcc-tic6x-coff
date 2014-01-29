@@ -640,6 +640,7 @@ do { char __buf[256];					\
    uninitialized internal linkage data object.  */
 
 #undef  ASM_OUTPUT_ALIGNED_DECL_LOCAL
+#ifndef OBJECT_FORMAT_HYBRID
 #define ASM_OUTPUT_ALIGNED_DECL_LOCAL(FILE, DECL, NAME, SIZE, ALIGN)	\
 do {									\
   if (PLACE_IN_SDATA_P (DECL))						\
@@ -653,6 +654,10 @@ do {									\
   ASM_OUTPUT_LABEL(FILE, NAME);						\
   ASM_OUTPUT_SKIP((FILE), (SIZE) ? (SIZE) : 1);				\
 } while (0)
+#else
+#define ASM_OUTPUT_ALIGNED_DECL_LOCAL(FILE, DECL, NAME, SIZE, ALIGN)    \
+    ASM_OUTPUT_ALIGNED_DECL_COMMON(FILE, DECL, NAME, SIZE, ALIGN)
+#endif
 
 #define CASE_VECTOR_PC_RELATIVE flag_pic
 #define JUMP_TABLES_IN_TEXT_SECTION flag_pic
