@@ -411,16 +411,85 @@ c6x_file_start (void)
   /* We conform to version 1.0 of the ABI.  */
   asm_fprintf (asm_out_file,
 	       "\t.c6xabi_attribute Tag_ABI_conformance, \"1.0\"\n");
-#else
-  asm_fprintf (asm_out_file,
-           "\t.battr \"TI\", Tag_File, 1, Tag_ABI_stack_align_needed(0)\n");
-  asm_fprintf (asm_out_file,
-           "\t.battr \"TI\", Tag_File, 1, Tag_ABI_stack_align_preserved(0)\n");
-  asm_fprintf (asm_out_file,
-           "\t.battr \"TI\", Tag_File, 1, Tag_Tramps_Use_SOC(1)\n");
 #endif
 
 }
+
+#ifdef OBJECT_FORMAT_HYBRID
+static void
+c6x_file_end(void)
+{
+    asm_fprintf (asm_out_file,
+        "\t.battr\t\"TI\", Tag_File, 1, Tag_ABI_stack_align_needed(0)\n");
+    asm_fprintf (asm_out_file,
+        "\t.battr\t\"TI\", Tag_File, 1, Tag_ABI_stack_align_preserved(0)\n");
+    asm_fprintf (asm_out_file,
+        "\t.battr\t\"TI\", Tag_File, 1, Tag_Tramps_Use_SOC(1)\n");
+
+    asm_fprintf (asm_out_file, "\t; workaround for intrinsics' missing .refs\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_addd\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_divd\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_mpyd\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_negd\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_subd\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_addf\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_divf\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_mpyf\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_negf\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_subf\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_eqf\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_neqf\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_lef\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_ltf\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_gef\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_gtf\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_eqd\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_neqd\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_led\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_ltd\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_ged\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_gtd\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_neqf\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_unordf\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_neqd\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_unordd\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_fixdi\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_fixdu\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_fixdlli\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_fixdull\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_fixfi\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_fixfu\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_fixflli\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_fixfull\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_cvtdf\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_cvtfd\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_fltid\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_fltud\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_fltllid\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_fltulld\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_fltif\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_fltuf\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_fltllif\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_fltullf\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_mpyll\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_llshl\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_llshru\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_llshr\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_divi\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_divu\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_remi\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_remu\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_divremi\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_divremu\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_divlli\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_divull\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_remlli\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_remull\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_divremull\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_strasgi\n");
+    asm_fprintf (asm_out_file, "\t.ref\t__c6xabi_strasgi_64plus\n");
+}
+#endif
 
 /* The LTO frontend only enables exceptions when it sees a function that
    uses it.  This changes the return value of dwarf2out_do_frame, so we
@@ -6812,6 +6881,11 @@ c6x_debug_unwind_info (void)
 
 #undef TARGET_ASM_FILE_START
 #define TARGET_ASM_FILE_START c6x_file_start
+
+#ifdef OBJECT_FORMAT_HYBRID
+#undef TARGET_ASM_FILE_END
+#define TARGET_ASM_FILE_END c6x_file_end
+#endif
 
 #undef  TARGET_PRINT_OPERAND
 #define TARGET_PRINT_OPERAND c6x_print_operand
