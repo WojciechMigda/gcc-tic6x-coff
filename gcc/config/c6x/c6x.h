@@ -32,6 +32,8 @@
 
 #undef PCC_BITFIELD_TYPE_MATTERS
 
+#define NO_DOT_IN_LABEL
+
 #undef TARGET_ASM_OUTPUT_IDENT
 #define TARGET_ASM_OUTPUT_IDENT hook_void_constcharptr
 
