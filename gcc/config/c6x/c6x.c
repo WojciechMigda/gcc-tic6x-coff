@@ -6941,4 +6941,22 @@ c6x_coff_asm_output_external (FILE *file, tree decl, const char *name)
   }
 }
 
+void
+c6x_externalize_label(const char *label_p, const bool is_builtin)
+{
+  tree    id;
+
+  gcc_assert (label_p && strlen(label_p));
+
+  if (flag_leading_underscore && is_builtin)
+    {
+      ++label_p;
+      gcc_assert (strlen(label_p));
+    }
+
+  id = build_libfunc_function(label_p);
+  mark_referenced(DECL_ASSEMBLER_NAME (id));
+  assemble_external(id);
+}
+
 #endif

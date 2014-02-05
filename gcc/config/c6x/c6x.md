@@ -2293,7 +2293,11 @@
    (clobber (reg:SI REG_B30))
    (clobber (reg:SI REG_B31))]
   ""
-  "%|%.\\tcall\\t%$\\t__c6xabi_divi"
+  {
+    c6x_externalize_label("__c6xabi_divi", TRUE);
+
+    return "%|%.\\tcall\\t%$\\t__c6xabi_divi";
+  }
   [(set_attr "type" "call")
    (set_attr "dest_regfile" "any")
    (set_attr "units" "s")

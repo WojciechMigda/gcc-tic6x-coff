@@ -2210,7 +2210,7 @@ static GTY(()) tree weak_decls;
    DECL is not external.  */
 
 void
-assemble_external (tree decl ATTRIBUTE_UNUSED)
+assemble_external (tree decl)
 {
   /*  Make sure that the ASM_OUT_FILE is open.
       If it's not, we should not be calling this function.  */

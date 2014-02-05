@@ -66,6 +66,9 @@
 void
 c6x_coff_asm_output_external (FILE *file, tree decl, const char *name);
 
+void
+c6x_externalize_label(const char *label_p, const bool is_builtin);
+
 #endif /* OBJECT_FORMAT_HYBRID */
 
 /* Feature bit definitions that enable specific insns.  */
