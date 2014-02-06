@@ -2339,7 +2339,11 @@
    (clobber (reg:SI REG_B30))
    (clobber (reg:SI REG_B31))]
   ""
-  "%|%.\\tcall\\t%$\\t__c6xabi_divu"
+  {
+    c6x_externalize_label("__c6xabi_divu", TRUE);
+
+    return "%|%.\\tcall\\t%$\\t__c6xabi_divu";
+  }
   [(set_attr "type" "call")
    (set_attr "dest_regfile" "any")
    (set_attr "units" "s")
@@ -2380,7 +2384,11 @@
    (clobber (reg:SI REG_B30))
    (clobber (reg:SI REG_B31))]
   ""
-  "%|%.\\tcall\\t%$\\t__c6xabi_remi"
+  {
+    c6x_externalize_label("__c6xabi_remi", TRUE);
+
+    return "%|%.\\tcall\\t%$\\t__c6xabi_remi";
+  }
   [(set_attr "type" "call")
    (set_attr "dest_regfile" "any")
    (set_attr "units" "s")
@@ -2421,7 +2429,11 @@
    (clobber (reg:SI REG_B30))
    (clobber (reg:SI REG_B31))]
   ""
-  "%|%.\\tcall\\t%$\\t__c6xabi_divremi"
+  {
+    c6x_externalize_label("__c6xabi_divremi", TRUE);
+
+    return "%|%.\\tcall\\t%$\\t__c6xabi_divremi";
+  }
   [(set_attr "type" "call")
    (set_attr "dest_regfile" "any")
    (set_attr "units" "s")
@@ -2462,7 +2474,11 @@
    (clobber (reg:SI REG_B30))
    (clobber (reg:SI REG_B31))]
   ""
-  "%|%.\\tcall\\t%$\\t__c6xabi_remu"
+  {
+    c6x_externalize_label("__c6xabi_remu", TRUE);
+
+    return "%|%.\\tcall\\t%$\\t__c6xabi_remu";
+  }
   [(set_attr "type" "call")
    (set_attr "dest_regfile" "any")
    (set_attr "units" "s")
@@ -2503,7 +2519,11 @@
    (clobber (reg:SI REG_B30))
    (clobber (reg:SI REG_B31))]
   ""
-  "%|%.\\tcall\\t%$\\t__c6xabi_divremu"
+  {
+    c6x_externalize_label("__c6xabi_divremu", TRUE);
+
+    return "%|%.\\tcall\\t%$\\t__c6xabi_divremu";
+  }
   [(set_attr "type" "call")
    (set_attr "dest_regfile" "any")
    (set_attr "units" "s")
@@ -2895,7 +2915,11 @@
    (unspec_volatile [(const_int 0)] UNSPECV_BLOCKAGE)
    (clobber (reg:SI REG_A3))]
   "TARGET_INSNS_64PLUS"
-  "%|%.\\tcallp\\t%$\\t__c6xabi_push_rts, a3"
+  {
+    c6x_externalize_label("__c6xabi_push_rts", TRUE);
+
+    return "%|%.\\tcallp\\t%$\\t__c6xabi_push_rts, a3";
+  }
   [(set_attr "type" "callp")
    (set_attr "dest_regfile" "a")
    (set_attr "units" "s")
@@ -2913,7 +2937,11 @@
    (clobber (reg:SI REG_A3))
    (return)]
   "TARGET_INSNS_64PLUS"
-  "%|%.\\tretp\\t%$\\t__c6xabi_pop_rts, a3"
+  {
+    c6x_externalize_label("__c6xabi_pop_rts", TRUE);
+
+    return "%|%.\\tretp\\t%$\\t__c6xabi_pop_rts, a3";
+  }
   [(set_attr "type" "callp")
    (set_attr "dest_regfile" "a")
    (set_attr "units" "s")
