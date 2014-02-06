@@ -1199,6 +1199,7 @@ builtin_define_type_minmax (const char *min_macro, const char *max_macro,
     = { "127", "255",
 	"32767", "65535",
 	"2147483647", "4294967295",
+	"549755813887", "1099511627775",
 	"9223372036854775807", "18446744073709551615",
 	"170141183460469231731687303715884105727",
 	"340282366920938463463374607431768211455" };
@@ -1215,8 +1216,9 @@ builtin_define_type_minmax (const char *min_macro, const char *max_macro,
     case 8:	idx = 0; break;
     case 16:	idx = 2; break;
     case 32:	idx = 4; break;
-    case 64:	idx = 6; break;
-    case 128:	idx = 8; break;
+    case 40:	idx = 6; break;
+    case 64:	idx = 8; break;
+    case 128:	idx = 10; break;
     default:    gcc_unreachable ();
     }
 
