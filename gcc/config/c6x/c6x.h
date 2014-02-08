@@ -407,7 +407,11 @@ struct c6x_args {
 #define FUNCTION_ARG_REGNO_P(r) \
     (((r) >= REG_A4 && (r) <= REG_A13) || ((r) >= REG_B4 && (r) <= REG_B13))
 
+#ifndef OBJECT_FORMAT_HYBRID
+#define DEFAULT_PCC_STRUCT_RETURN 0
+#else
 #define DEFAULT_PCC_STRUCT_RETURN 1
+#endif
 
 #define FUNCTION_PROFILER(file, labelno) \
   fatal_error ("profiling is not yet implemented for this architecture")

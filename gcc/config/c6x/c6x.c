@@ -656,7 +656,11 @@ c6x_pass_by_reference (cumulative_args_t cum_v ATTRIBUTE_UNUSED,
     size = int_size_in_bytes (type);
   else if (mode != VOIDmode)
     size = GET_MODE_SIZE (mode);
-  return size > 2 * UNITS_PER_WORD || size == -1 || (type && AGGREGATE_TYPE_P(type));
+  return size > 2 * UNITS_PER_WORD || size == -1
+#ifdef OBJECT_FORMAT_HYBRID
+    || (type && AGGREGATE_TYPE_P(type))
+#endif
+  ;
 }
 
 /* Decide whether a type should be returned in memory (true)
