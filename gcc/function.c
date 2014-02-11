@@ -4765,8 +4765,17 @@ expand_function_start (tree subr)
 	     it.  */
 	  if (sv)
 	    {
+#if defined OBJECT_FORMAT_HYBRID && 1
+	      enum machine_mode mode = GET_MODE (sv);
+	      rtx null_label = gen_label_rtx ();
+
+	      emit_cmp_and_jump_insns (sv, CONST0_RTX (mode), EQ, NULL_RTX, mode, true, null_label);
+#endif
 	      value_address = gen_reg_rtx (Pmode);
 	      emit_move_insn (value_address, sv);
+#if defined OBJECT_FORMAT_HYBRID && 1
+	      emit_label (null_label);
+#endif
 	    }
 	}
       if (value_address)
@@ -5176,7 +5185,10 @@ expand_function_end (void)
       value_address = convert_memory_address (GET_MODE (outgoing),
 					      value_address);
 
+#ifndef OBJECT_FORMAT_HYBRID
+      /* TI-COFF doesn't do that */
       emit_move_insn (outgoing, value_address);
+#endif
 
       /* Show return register used to hold result (in this case the address
 	 of the result.  */
