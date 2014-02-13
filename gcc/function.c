@@ -4765,7 +4765,7 @@ expand_function_start (tree subr)
 	     it.  */
 	  if (sv)
 	    {
-#if defined OBJECT_FORMAT_HYBRID && 1
+#if defined OBJECT_FORMAT_HYBRID && 0
 	      enum machine_mode mode = GET_MODE (sv);
 	      rtx null_label = gen_label_rtx ();
 
@@ -4773,7 +4773,7 @@ expand_function_start (tree subr)
 #endif
 	      value_address = gen_reg_rtx (Pmode);
 	      emit_move_insn (value_address, sv);
-#if defined OBJECT_FORMAT_HYBRID && 1
+#if defined OBJECT_FORMAT_HYBRID && 0
 	      emit_label (null_label);
 #endif
 	    }

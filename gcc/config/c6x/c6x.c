@@ -6900,4 +6900,33 @@ c6x_externalize_label(const char *label_p, const bool is_builtin)
   assemble_external(id);
 }
 
+rtx
+c6x_function_struct_ret_null_value_address_jump_and_label(
+    tree placeholder,
+    struct function *fun,
+    tree function_decl)
+{
+  rtx     null_label = 0;
+
+  if (((TREE_CODE (placeholder) == RESULT_DECL)
+        || (TREE_CODE (placeholder) == COMPONENT_REF && TREE_CODE(TREE_OPERAND (placeholder, 0)) == RESULT_DECL))
+      && (fun->returns_struct || fun->returns_pcc_struct))
+    {
+      enum machine_mode mode;
+      rtx               value_address = DECL_RTL (DECL_RESULT (function_decl));
+
+      null_label = gen_label_rtx ();
+      if (!DECL_BY_REFERENCE (DECL_RESULT (function_decl)))
+        {
+          value_address = XEXP (value_address, 0);
+        }
+      mode = GET_MODE (value_address);
+
+      emit_cmp_and_jump_insns (value_address, CONST0_RTX (mode), EQ, NULL_RTX, mode,
+          true, null_label);
+    }
+
+  return null_label;
+}
+
 #endif

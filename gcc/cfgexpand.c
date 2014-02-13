@@ -2206,35 +2206,13 @@ expand_gimple_stmt_1 (gimple stmt)
 	    else
 	      {
 #ifdef OBJECT_FORMAT_HYBRID
-	        bool    label_needed = false;
-	        rtx     null_label = gen_label_rtx ();
-
-	        if ((TREE_CODE (lhs) == RESULT_DECL) && (cfun->returns_struct || cfun->returns_pcc_struct))
-	          {
-	            rtx     value_address = DECL_RTL (DECL_RESULT (current_function_decl));
-	            tree    type = TREE_TYPE (DECL_RESULT (current_function_decl));
-	            enum    machine_mode mode;
-
-	            if (DECL_BY_REFERENCE (DECL_RESULT (current_function_decl)))
-	              {
-	                type = TREE_TYPE (type);
-	              }
-	            else
-	              {
-	                value_address = XEXP (value_address, 0);
-	              }
-	            mode = GET_MODE (value_address);
-
-	            emit_cmp_and_jump_insns (value_address, CONST0_RTX (mode), EQ, NULL_RTX, mode,
-                      true, null_label);
-
-	            label_needed = true;
-	          }
+	        rtx null_label =
+	            c6x_function_struct_ret_null_value_address_jump_and_label(lhs, cfun, current_function_decl);
 #endif
 	        expand_assignment (lhs, rhs,
 				   gimple_assign_nontemporal_move_p (stmt));
 #ifdef OBJECT_FORMAT_HYBRID
-	        if (label_needed)
+	        if (null_label)
 	          {
 	            emit_label (null_label);
 	          }
