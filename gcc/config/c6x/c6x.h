@@ -77,6 +77,9 @@ c6x_function_struct_ret_null_value_address_jump_and_label(
     struct function *fun,
     tree function_decl);
 
+rtx
+c6x_insn_branch_set_mcnop(rtx insn, size_t const nop_cnt);
+
 #endif /* OBJECT_FORMAT_HYBRID */
 
 /* Feature bit definitions that enable specific insns.  */
@@ -107,6 +110,8 @@ extern c6x_cpu_t c6x_arch;
 #define TARGET_INSNS_67		((c6x_insn_mask & C6X_INSNS_C67X) != 0)
 /* True if the target has C67x+ instructions.  */
 #define TARGET_INSNS_67PLUS	((c6x_insn_mask & C6X_INSNS_C67XP) != 0)
+/* True if the target has C674x instructions.  */
+#define TARGET_INSNS_674        ((c6x_insn_mask & C6X_INSNS_C674X) != 0)
 
 /* True if the target supports doubleword loads.  */
 #define TARGET_LDDW		(TARGET_INSNS_64 || TARGET_INSNS_67)
@@ -118,6 +123,14 @@ extern c6x_cpu_t c6x_arch;
 #define TARGET_FP		TARGET_INSNS_67
 /* True if the target has C67x+ floating point extensions.  */
 #define TARGET_FP_EXT		TARGET_INSNS_67PLUS
+
+#define TARGET_BNOP target_bnop()
+static inline bool target_bnop(void)
+{
+  bool result = TARGET_INSNS_64 || TARGET_INSNS_64PLUS ||TARGET_INSNS_674;
+
+  return result;
+}
 
 #define TARGET_DEFAULT 0
 

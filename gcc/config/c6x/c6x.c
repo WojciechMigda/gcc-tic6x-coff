@@ -2963,7 +2963,7 @@ c6x_expand_epilogue (bool sibcall)
 	emit_jump_insn (gen_pop_rts ());
       else
 	emit_jump_insn (gen_return_internal (gen_rtx_REG (SImode,
-							  RETURN_ADDR_REGNO)));
+							  RETURN_ADDR_REGNO),  CONST0_RTX(SImode)));
     }
 }
 
@@ -5043,6 +5043,7 @@ reorg_emit_nops (rtx *call_labels)
   int prev_clock, earliest_bb_end;
   int prev_implicit_nops;
   rtx insn = get_insns ();
+  rtx br_mcnop = NULL;
 
   /* We look at one insn (or bundle inside a sequence) in each iteration, storing
      its issue time in PREV_CLOCK for the next iteration.  If there is a gap in
@@ -5095,8 +5096,17 @@ reorg_emit_nops (rtx *call_labels)
 		  cycles -= prev_implicit_nops;
 		  if (cycles > 1)
 		    {
-		      rtx nop = emit_nop_after (cycles - 1, prev);
-		      insn_set_clock (nop, prev_clock + prev_implicit_nops + 1);
+		      if (TARGET_BNOP && br_mcnop)
+		        {
+		          c6x_insn_branch_set_mcnop(br_mcnop, cycles - 1);
+		          fprintf(asm_out_file, "; BR1> clock mcnop %d\n", insn_get_clock(br_mcnop));
+		          br_mcnop = NULL;
+		        }
+		      else
+		        {
+		          rtx nop = emit_nop_after (cycles - 1, prev);
+		          insn_set_clock (nop, prev_clock + prev_implicit_nops + 1);
+		        }
 		    }
 		}
 	      prev_clock = this_clock;
@@ -5117,6 +5127,10 @@ reorg_emit_nops (rtx *call_labels)
 	  /* If not scheduling, we've emitted NOPs after calls already.  */
 	  && (c6x_flag_schedule_insns2 || !returning_call_p (insn)))
 	{
+	  if (TARGET_BNOP && get_attr_type (insn) == TYPE_BRANCH && get_attr_mcnop (insn) == MCNOP_YES)
+	    {
+	      br_mcnop = insn;
+	    }
 	  max_cycles = get_attr_cycles (insn);
 	  if (get_attr_type (insn) == TYPE_CALLP)
 	    prev_implicit_nops = 5;
@@ -5133,7 +5147,15 @@ reorg_emit_nops (rtx *call_labels)
 	    earliest_bb_end = this_clock + max_cycles;
 	}
       else if (max_cycles > 1)
+        {
+          if (TARGET_BNOP && br_mcnop)
+            {
+              c6x_insn_branch_set_mcnop(br_mcnop, max_cycles - 1);
+              br_mcnop = NULL;
+            }
+          else
 	emit_nop_after (max_cycles - 1, insn);
+	    }
 
       prev = insn;
       first = false;
@@ -5148,8 +5170,16 @@ reorg_emit_nops (rtx *call_labels)
 	  int cycles = earliest_bb_end - prev_clock;
 	  if (cycles > 1)
 	    {
-	      prev = emit_nop_after (cycles - 1, prev);
-	      insn_set_clock (prev, prev_clock + prev_implicit_nops + 1);
+	      if (TARGET_BNOP && br_mcnop)
+	        {
+	          c6x_insn_branch_set_mcnop(br_mcnop, cycles - 1);
+	          br_mcnop = NULL;
+	        }
+	      else
+	        {
+	          prev = emit_nop_after (cycles - 1, prev);
+	          insn_set_clock (prev, prev_clock + prev_implicit_nops + 1);
+	        }
 	    }
 	  earliest_bb_end = 0;
 	  prev_clock = -1;
@@ -5191,7 +5221,7 @@ split_delayed_branch (rtx insn)
 	    newpat = gen_indirect_sibcall_shadow ();
 	  else
 	    newpat = gen_sibcall_shadow (callee);
-	  pat = gen_real_jump (callee);
+	  pat = gen_real_jump (callee, CONST0_RTX(SImode));
 	}
       else if (dest != NULL_RTX)
 	{
@@ -5219,7 +5249,7 @@ split_delayed_branch (rtx insn)
 	  && GET_CODE (XVECEXP (pat, 0, 0)) == RETURN)
 	{
 	  newpat = gen_return_shadow ();
-	  pat = gen_real_ret (XEXP (XVECEXP (pat, 0, 1), 0));
+	  pat = gen_real_ret (XEXP (XVECEXP (pat, 0, 1), 0), CONST0_RTX(SImode));
 	  newpat = duplicate_cond (newpat, insn);
 	}
       else
@@ -5230,7 +5260,7 @@ split_delayed_branch (rtx insn)
 	    src = SET_SRC (pat);
 	    op = XEXP (src, code == CODE_FOR_br_true ? 1 : 2);
 	    newpat = gen_condjump_shadow (op);
-	    pat = gen_real_jump (op);
+	    pat = gen_real_jump (op, CONST0_RTX(SImode));
 	    if (code == CODE_FOR_br_true)
 	      pat = gen_rtx_COND_EXEC (VOIDmode, XEXP (src, 0), pat);
 	    else
@@ -5251,7 +5281,7 @@ split_delayed_branch (rtx insn)
 
 	  case CODE_FOR_return_internal:
 	    newpat = gen_return_shadow ();
-	    pat = gen_real_ret (XEXP (XVECEXP (pat, 0, 1), 0));
+	    pat = gen_real_ret (XEXP (XVECEXP (pat, 0, 1), 0), CONST0_RTX(SImode));
 	    break;
 
 	  default:
@@ -6927,6 +6957,35 @@ c6x_function_struct_ret_null_value_address_jump_and_label(
     }
 
   return null_label;
+}
+
+rtx
+c6x_insn_branch_set_mcnop(rtx insn, size_t const nop_cnt)
+{
+  if (GET_CODE(insn) == INSN)
+    {
+      rtx   rtl = PATTERN(insn);
+
+      if (GET_CODE(rtl) == COND_EXEC)
+        {
+          rtl = COND_EXEC_CODE(PATTERN(insn));
+        }
+
+      if (GET_CODE(rtl) == UNSPEC)
+        {
+          XVECEXP(rtl, 0, 2) = gen_rtx_CONST_INT(SImode, nop_cnt);
+        }
+      else
+        {
+          fprintf(asm_out_file, "; GET_CODE(rtl) = %d\n", GET_CODE(rtl));
+        }
+    }
+  else
+    {
+      fprintf(asm_out_file, "; GET_CODE(insn) = %d\n", GET_CODE(insn));
+    }
+
+  return insn;
 }
 
 #endif

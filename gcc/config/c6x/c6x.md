@@ -264,6 +264,9 @@
 	]
 	(const_string "unknown")))
 
+(define_attr "mcnop" "no,yes"
+  (const_string "no"))
+
 (define_automaton "c6x_1,c6x_2,c6x_m1,c6x_m2,c6x_t1,c6x_t2,c6x_branch")
 (automata_option "no-comb-vect")
 (automata_option "ndfa")
@@ -1239,7 +1242,7 @@
 (define_insn "indirect_jump"
   [(set (pc) (match_operand:SI 0 "register_operand" "a,b"))]
   ""
-  "%|%.\\tb\\t%$\\t%0"
+  "%|%.\\tb\\t%$\\t%0 ;; indirect_jump"
   [(set_attr "type" "branch")
    (set_attr "units" "s")
    (set_attr "cross" "y,n")
@@ -1249,7 +1252,7 @@
   [(set (pc)
 	(label_ref (match_operand 0 "" "")))]
   ""
-  "%|%.\\tb\\t%$\\t%l0"
+  "%|%.\\tb\\t%$\\t%l0 ;; jump"
   [(set_attr "type" "branch")
    (set_attr "units" "s")
    (set_attr "dest_regfile" "any")])
@@ -1265,7 +1268,7 @@
   [(set (pc) (match_operand:SI 0 "register_operand" "b"))
    (use (label_ref (match_operand 1 "" "")))]
   "!flag_pic || !TARGET_INSNS_64"
-  "%|\\tb\\t%$\\t%0"
+  "%|\\tb\\t%$\\t%0 ;; tablejump_internal"
   [(set_attr "type" "branch")
    (set_attr "predicable" "no")
    (set_attr "units" "s")
@@ -1374,7 +1377,7 @@
 		      (label_ref (match_operand 2 "" ""))
 		      (pc)))]
   ""
-  "%|[%J0]\\tb\\t%$\\t%l2"
+  "%|[%J0]\\tb\\t%$\\t%l2 ;; br_true"
   [(set_attr "type" "branch")
    (set_attr "predicable" "no")
    (set_attr "units" "s")
@@ -1388,7 +1391,7 @@
 		      (pc)
 		      (label_ref (match_operand 2 "" ""))))]
   ""
-  "%|[%j0]\\tb\\t%$\\t%l2"
+  "%|[%j0]\\tb\\t%$\\t%l2 ;; br_false"
   [(set_attr "type" "branch")
    (set_attr "predicable" "no")
    (set_attr "units" "s")
@@ -1523,18 +1526,38 @@
 ;; -------------------------------------------------------------------------
 
 (define_insn "real_jump"
-  [(unspec [(match_operand 0 "c6x_jump_operand" "a,b,s") (const_int 0)]
+  [(unspec [(match_operand 0 "c6x_jump_operand" "a,b,s") (const_int 0)
+	(match_operand:SI 1 "const_int_operand" "n,n,n")
+  ]
 	   UNSPEC_REAL_JUMP)]
   ""
 {
+  HOST_WIDE_INT nopcnt = MIN(INTVAL (operands[1]), 5);
+
   if (GET_CODE (operands[0]) == LABEL_REF)
-    return "%|%.\\tb\\t%$\\t%l0";
-  return "%|%.\\tb\\t%$\\t%0";
+    {
+      if (nopcnt == 0)
+        return "%|%.\\tb\\t%$\\t%l0 ;; real_jump";
+      else if (TARGET_BNOP)
+        return "%|%.\\tbnop\\t%$\\t%l0, %1 ;; real_jump w/NOP";
+      else
+        gcc_unreachable();
+    }
+  else
+    {
+      if (nopcnt == 0)
+        return "%|%.\\tb\\t%$\\t%0 ;; real_jump";
+      else if (TARGET_BNOP)
+        return "%|%.\\tbnop\\t%$\\t%0, %1 ;; real_jump w/NOP";
+      else
+        gcc_unreachable();
+    }
 }
   [(set_attr "type" "branch")
    (set_attr "has_shadow" "y")
    (set_attr "units" "s")
    (set_attr "cross" "y,n,n")
+   (set_attr "mcnop" "yes")
    (set_attr "dest_regfile" "b,b,any")])
 
 (define_insn "real_call"
@@ -1542,7 +1565,7 @@
 	   UNSPEC_REAL_JUMP)
    (clobber (reg:SI REG_B3))]
   ""
-  "%|%.\\tcall\\t%$\\t%0"
+  "%|%.\\tcall\\t%$\\t%0 ;; real_call"
   [(set_attr "type" "call")
    (set_attr "has_shadow" "y")
    (set_attr "predicable" "no")
@@ -1551,14 +1574,34 @@
    (set_attr "dest_regfile" "b,b,any")])
 
 (define_insn "real_ret"
-  [(unspec [(match_operand 0 "register_operand" "a,b") (const_int 2)]
-	   UNSPEC_REAL_JUMP)]
+  [(unspec [(match_operand 0 "register_operand" "a,b")
+   (const_int 2)
+	(match_operand:SI 1 "const_int_operand" "n,n")
+   ]
+	   UNSPEC_REAL_JUMP)
+  ]
   ""
-  "%|%.\\tret\\t%$\\t%0"
+{
+  HOST_WIDE_INT nopcnt = MIN(INTVAL (operands[1]), 5);
+
+  if (nopcnt == 0)
+    {
+      return "%|%.\\tret\\t%$\\t%0 ;; real_ret";
+    }
+  else if (TARGET_BNOP)
+    {
+      return "%|%.\\tretnop\\t%$\\t%0, %1 ;; real_ret w/NOP";
+    }
+  else
+    {
+      gcc_unreachable();
+    }
+}
   [(set_attr "type" "branch")
    (set_attr "has_shadow" "y")
    (set_attr "units" "s")
    (set_attr "cross" "y,n")
+   (set_attr "mcnop" "yes")
    (set_attr "dest_regfile" "b")])
 
 ;; computed_jump_p returns true if it finds a constant; so use one in the
@@ -2025,7 +2068,7 @@
   [(call (mem (match_operand:SI 0 "c6x_call_operand" "S1,a,b"))
 	 (const_int 0))]
   "!SIBLING_CALL_P (insn)"
-  "%|%.\\tcall\\t%$\\t%0"
+  "%|%.\\tcall\\t%$\\t%0 ;; call_internal"
   [(set_attr "type" "call")
    (set_attr "predicable" "no")
    (set_attr "units" "s")
@@ -2037,7 +2080,7 @@
 	(call (mem (match_operand:SI 1 "c6x_call_operand" "S1,a,b"))
 	      (const_int 0)))]
   ""
-  "%|%.\\tcall\\t%$\\t%1"
+  "%|%.\\tcall\\t%$\\t%1 ;; call_value_internal"
   [(set_attr "type" "call")
    (set_attr "predicable" "no")
    (set_attr "units" "s")
@@ -2048,7 +2091,7 @@
   [(call (mem (match_operand:SI 0 "c6x_call_operand" "S1,C"))
 	 (const_int 0))]
   "SIBLING_CALL_P (insn)"
-  "%|%.\\tb\\t%$\\t%0"
+  "%|%.\\tb\\t%$\\t%0 ;; sibcall_internal"
   [(set_attr "type" "branch")
    (set_attr "predicable" "no")
    (set_attr "units" "s")
@@ -2081,9 +2124,39 @@
 
 (define_insn "return_internal"
   [(return)
-   (use (match_operand:SI 0 "register_operand" "b"))]
+   (use (match_operand:SI 0 "register_operand" "b"))
+   (match_operand:SI 1 "const_int_operand" "n")
+  ]
   "reload_completed"
-  "%|%.\\tret\\t%$\\t%0"
+{
+  HOST_WIDE_INT nopcnt = MIN(INTVAL (operands[1]), 5);
+
+  if (nopcnt == 0)
+    {
+      return "%|%.\\tret\\t%$\\t%0 ;; return_internal";
+    }
+  else if (TARGET_BNOP)
+    {
+      return "%|%.\\tretnop\\t%$\\t%0, %1 ;; return_internal w/NOP";
+    }
+  else
+    {
+      gcc_unreachable();
+    }
+}
+  [(set_attr "type" "branch")
+   (set_attr "units" "s")
+   (set_attr "mcnop" "yes")
+   (set_attr "dest_regfile" "b")])
+
+(define_insn "return_internal_"
+  [(return)
+   (use (match_operand:SI 0 "register_operand" "b"))
+  ]
+  "reload_completed"
+  {
+    return "%|%.\\tret\\t%$\\t%0 ;; return_internal_";
+  }
   [(set_attr "type" "branch")
    (set_attr "units" "s")
    (set_attr "dest_regfile" "b")])
