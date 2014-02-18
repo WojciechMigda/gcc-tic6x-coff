@@ -6962,7 +6962,7 @@ c6x_function_struct_ret_null_value_address_jump_and_label(
 rtx
 c6x_insn_branch_set_mcnop(rtx insn, size_t const nop_cnt)
 {
-  if (GET_CODE(insn) == INSN)
+  if (GET_CODE(insn) == INSN || GET_CODE(insn) == JUMP_INSN)
     {
       rtx   rtl = PATTERN(insn);
 
@@ -6971,18 +6971,22 @@ c6x_insn_branch_set_mcnop(rtx insn, size_t const nop_cnt)
           rtl = COND_EXEC_CODE(PATTERN(insn));
         }
 
-      if (GET_CODE(rtl) == UNSPEC)
+      if (GET_CODE(rtl) == UNSPEC || GET_CODE(rtl) == PARALLEL)
         {
           XVECEXP(rtl, 0, 2) = gen_rtx_CONST_INT(SImode, nop_cnt);
         }
       else
         {
           fprintf(asm_out_file, "; GET_CODE(rtl) = %d\n", GET_CODE(rtl));
+          print_simple_rtl(asm_out_file, rtl);
+          gcc_unreachable();
         }
     }
   else
     {
       fprintf(asm_out_file, "; GET_CODE(insn) = %d\n", GET_CODE(insn));
+      print_simple_rtl(asm_out_file, insn);
+      gcc_unreachable();
     }
 
   return insn;
