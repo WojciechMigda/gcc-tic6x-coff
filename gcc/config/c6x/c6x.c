@@ -6383,6 +6383,8 @@ enum c6x_builtins
   C6X_BUILTIN_AVG2,
   C6X_BUILTIN_AVGU4,
 
+  C6X_BUILTIN_SWAP4,
+
   C6X_BUILTIN_MAX
 };
 
@@ -6483,6 +6485,8 @@ c6x_init_builtins (void)
 
   def_builtin ("__builtin_c6x_abs", int_ftype_int, C6X_BUILTIN_ABS);
   def_builtin ("__builtin_c6x_abs2", v2hi_ftype_v2hi, C6X_BUILTIN_ABS2);
+
+  def_builtin ("__builtin_c6x_swap4", v2hi_ftype_v2hi, C6X_BUILTIN_SWAP4);
 }
 
 
@@ -6526,7 +6530,8 @@ static const struct builtin_description bdesc_2arg[] =
 static const struct builtin_description bdesc_1arg[] =
 {
   { CODE_FOR_ssabssi2, "__builtin_c6x_abs", C6X_BUILTIN_ABS },
-  { CODE_FOR_ssabsv2hi2, "__builtin_c6x_abs2", C6X_BUILTIN_ABS2 }
+  { CODE_FOR_ssabsv2hi2, "__builtin_c6x_abs2", C6X_BUILTIN_ABS2 },
+  { CODE_FOR_bswapv2hi2, "__builtin_c6x_swap4", C6X_BUILTIN_SWAP4 }
 };
 
 /* Errors in the source file can cause expand_expr to return const0_rtx

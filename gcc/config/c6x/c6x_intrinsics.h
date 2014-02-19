@@ -186,6 +186,11 @@ _subc (int src1, int src2)
   return __builtin_c6x_subc (src1, src2);
 }
 
+__extension__ static __inline unsigned __attribute__ ((__always_inline__))
+_swap4 (unsigned src)
+{
+  return __builtin_c6x_swap4 ((__v2hi)src);
+}
 
 #ifdef __cplusplus
 }
