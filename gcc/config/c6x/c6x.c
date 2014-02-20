@@ -6384,6 +6384,7 @@ enum c6x_builtins
   C6X_BUILTIN_AVGU4,
 
   C6X_BUILTIN_SWAP4,
+  C6X_BUILTIN_ROTL,
 
   C6X_BUILTIN_MAX
 };
@@ -6422,6 +6423,9 @@ c6x_init_builtins (void)
   tree int_ftype_int_int
     = build_function_type_list (integer_type_node, integer_type_node,
 				integer_type_node, NULL_TREE);
+  tree uint_ftype_uint_uint
+    = build_function_type_list (unsigned_type_node, unsigned_type_node,
+                                unsigned_type_node, NULL_TREE);
   tree v2hi_ftype_v2hi
     = build_function_type_list (V2HI_type_node, V2HI_type_node, NULL_TREE);
   tree v4qi_ftype_v4qi_v4qi
@@ -6487,6 +6491,7 @@ c6x_init_builtins (void)
   def_builtin ("__builtin_c6x_abs2", v2hi_ftype_v2hi, C6X_BUILTIN_ABS2);
 
   def_builtin ("__builtin_c6x_swap4", v2hi_ftype_v2hi, C6X_BUILTIN_SWAP4);
+  def_builtin ("__builtin_c6x_rotl", uint_ftype_uint_uint, C6X_BUILTIN_ROTL);
 }
 
 
@@ -6524,7 +6529,9 @@ static const struct builtin_description bdesc_2arg[] =
 
   { CODE_FOR_clrr, "__builtin_c6x_clrr", C6X_BUILTIN_CLRR },
   { CODE_FOR_extr, "__builtin_c6x_extr", C6X_BUILTIN_EXTR },
-  { CODE_FOR_extru, "__builtin_c6x_extru", C6X_BUILTIN_EXTRU }
+  { CODE_FOR_extru, "__builtin_c6x_extru", C6X_BUILTIN_EXTRU },
+
+  { CODE_FOR_rotlsi3, "__builtin_c6x_rotl", C6X_BUILTIN_ROTL }
 };
 
 static const struct builtin_description bdesc_1arg[] =

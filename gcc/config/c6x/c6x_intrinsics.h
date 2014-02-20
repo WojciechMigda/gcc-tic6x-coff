@@ -192,6 +192,12 @@ _swap4 (unsigned src)
   return __builtin_c6x_swap4 ((__v2hi)src);
 }
 
+__extension__ static __inline unsigned __attribute__ ((__always_inline__))
+_rotl (unsigned src1, unsigned src2)
+{
+  return __builtin_c6x_rotl (src1, src2);
+}
+
 #ifdef __cplusplus
 }
 #endif
