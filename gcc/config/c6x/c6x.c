@@ -6423,9 +6423,6 @@ c6x_init_builtins (void)
   tree int_ftype_int_int
     = build_function_type_list (integer_type_node, integer_type_node,
 				integer_type_node, NULL_TREE);
-  tree uint_ftype_uint_uint
-    = build_function_type_list (unsigned_type_node, unsigned_type_node,
-                                unsigned_type_node, NULL_TREE);
   tree v2hi_ftype_v2hi
     = build_function_type_list (V2HI_type_node, V2HI_type_node, NULL_TREE);
   tree v4qi_ftype_v4qi_v4qi
@@ -6491,7 +6488,7 @@ c6x_init_builtins (void)
   def_builtin ("__builtin_c6x_abs2", v2hi_ftype_v2hi, C6X_BUILTIN_ABS2);
 
   def_builtin ("__builtin_c6x_swap4", v2hi_ftype_v2hi, C6X_BUILTIN_SWAP4);
-  def_builtin ("__builtin_c6x_rotl", uint_ftype_uint_uint, C6X_BUILTIN_ROTL);
+  def_builtin ("__builtin_c6x_rotl", int_ftype_int_int, C6X_BUILTIN_ROTL);
 }
 
 
