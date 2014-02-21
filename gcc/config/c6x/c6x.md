@@ -117,6 +117,7 @@
    UNSPEC_EXTU
    UNSPEC_SUBC
    UNSPEC_AVG
+   UNSPEC_PACK
 ])
 
 (define_c_enum "unspecv" [
@@ -3165,6 +3166,26 @@
 	(match_operand:HI 1 "register_operand" "a,b,?b,?a"))]
   "TARGET_INSNS_64"
   "%|%.\\tpackhl2\\t%$\\t%0, %1, %0"
+  [(set_attr "units" "ls")
+   (set_attr "cross" "n,n,y,y")])
+
+(define_insn "packlh2v2hi"
+  [(set (match_operand:V2HI 0 "register_operand" "=a,b,a,b")
+        (unspec:V2HI [ (zero_extract:V2HI (match_operand:V2HI 1 "register_operand" "a,b,a,b") (const_int 0) (const_int 16) )
+                       (zero_extract:V2HI (match_operand:V2HI 2 "register_operand" "a,b,?b,?a") (const_int 16) (const_int 16) )
+                     ] UNSPEC_PACK))]
+  "TARGET_INSNS_64"
+  "%|%.\\tpacklh2\\t%$\\t%1, %2, %0"
+  [(set_attr "units" "ls")
+   (set_attr "cross" "n,n,y,y")])
+
+(define_insn "packhl2v2hi"
+  [(set (match_operand:V2HI 0 "register_operand" "=a,b,a,b")
+        (unspec:V2HI [ (zero_extract:V2HI (match_operand:V2HI 1 "register_operand" "a,b,a,b") (const_int 16) (const_int 16) )
+                       (zero_extract:V2HI (match_operand:V2HI 2 "register_operand" "a,b,?b,?a") (const_int 0) (const_int 16) )
+                     ] UNSPEC_PACK))]
+  "TARGET_INSNS_64"
+  "%|%.\\tpackhl2\\t%$\\t%1, %2, %0"
   [(set_attr "units" "ls")
    (set_attr "cross" "n,n,y,y")])
 

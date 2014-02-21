@@ -6385,6 +6385,8 @@ enum c6x_builtins
 
   C6X_BUILTIN_SWAP4,
   C6X_BUILTIN_ROTL,
+  C6X_BUILTIN_PACKLH2,
+  C6X_BUILTIN_PACKHL2,
 
   C6X_BUILTIN_MAX
 };
@@ -6489,6 +6491,9 @@ c6x_init_builtins (void)
 
   def_builtin ("__builtin_c6x_swap4", v2hi_ftype_v2hi, C6X_BUILTIN_SWAP4);
   def_builtin ("__builtin_c6x_rotl", int_ftype_int_int, C6X_BUILTIN_ROTL);
+
+  def_builtin ("__builtin_c6x_packlh2", v2hi_ftype_v2hi_v2hi, C6X_BUILTIN_PACKLH2);
+  def_builtin ("__builtin_c6x_packhl2", v2hi_ftype_v2hi_v2hi, C6X_BUILTIN_PACKHL2);
 }
 
 
@@ -6528,7 +6533,10 @@ static const struct builtin_description bdesc_2arg[] =
   { CODE_FOR_extr, "__builtin_c6x_extr", C6X_BUILTIN_EXTR },
   { CODE_FOR_extru, "__builtin_c6x_extru", C6X_BUILTIN_EXTRU },
 
-  { CODE_FOR_rotlsi3, "__builtin_c6x_rotl", C6X_BUILTIN_ROTL }
+  { CODE_FOR_rotlsi3, "__builtin_c6x_rotl", C6X_BUILTIN_ROTL },
+
+  { CODE_FOR_packlh2v2hi, "__builtin_c6x_packlh2", C6X_BUILTIN_PACKLH2 },
+  { CODE_FOR_packhl2v2hi, "__builtin_c6x_packhl2", C6X_BUILTIN_PACKHL2 }
 };
 
 static const struct builtin_description bdesc_1arg[] =

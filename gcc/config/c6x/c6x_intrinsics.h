@@ -198,6 +198,18 @@ _rotl (unsigned src1, unsigned src2)
   return __builtin_c6x_rotl (src1, src2);
 }
 
+__extension__ static __inline unsigned __attribute__ ((__always_inline__))
+_packlh2 (unsigned src1, unsigned src2)
+{
+  return (unsigned)__builtin_c6x_packlh2 ((__v2hi)src1, (__v2hi)src2);
+}
+
+__extension__ static __inline unsigned __attribute__ ((__always_inline__))
+_packhl2 (unsigned src1, unsigned src2)
+{
+  return (unsigned)__builtin_c6x_packhl2 ((__v2hi)src1, (__v2hi)src2);
+}
+
 #ifdef __cplusplus
 }
 #endif
