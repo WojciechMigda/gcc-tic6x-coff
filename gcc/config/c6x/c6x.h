@@ -481,6 +481,14 @@ struct GTY(()) machine_function
     }								\
   while (0)
 
+#ifdef OBJECT_FORMAT_HYBRID
+
+/* .type */
+#undef ASM_OUTPUT_TYPE_DIRECTIVE
+#define ASM_OUTPUT_TYPE_DIRECTIVE(STREAM, NAME, TYPE)
+
+#endif
+
 /* This should be the same as the definition in elfos.h, plus the call
    to output special unwinding directives.  */
 #undef ASM_DECLARE_FUNCTION_SIZE
