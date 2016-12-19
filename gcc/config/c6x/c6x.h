@@ -483,6 +483,12 @@ struct GTY(()) machine_function
 
 #ifdef OBJECT_FORMAT_HYBRID
 
+static inline void noop_asm_output_ident_directive (const char *ident_str ATTRIBUTE_UNUSED){}
+
+/* .ident */
+#undef TARGET_ASM_OUTPUT_IDENT
+#define TARGET_ASM_OUTPUT_IDENT noop_asm_output_ident_directive
+
 /* .type */
 #undef ASM_OUTPUT_TYPE_DIRECTIVE
 #define ASM_OUTPUT_TYPE_DIRECTIVE(STREAM, NAME, TYPE)
