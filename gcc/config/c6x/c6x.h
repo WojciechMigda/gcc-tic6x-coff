@@ -22,6 +22,8 @@
 #ifndef GCC_C6X_H
 #define GCC_C6X_H
 
+#define OBJECT_FORMAT_HYBRID
+
 /* Feature bit definitions that enable specific insns.  */
 #define C6X_INSNS_C62X		1
 #define C6X_INSNS_C64X		2
