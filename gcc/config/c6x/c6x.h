@@ -484,8 +484,12 @@ struct GTY(()) machine_function
 /* This should be the same as the definition in elfos.h, plus the call
    to output special unwinding directives.  */
 #undef ASM_DECLARE_FUNCTION_SIZE
+#ifndef OBJECT_FORMAT_HYBRID
 #define ASM_DECLARE_FUNCTION_SIZE(STREAM, NAME, DECL) \
   c6x_function_end (STREAM, NAME)
+#else
+#define ASM_DECLARE_FUNCTION_SIZE(STREAM, NAME, DECL)
+#endif
 
 /* Arbitrarily choose A4/A5.  */
 #define EH_RETURN_DATA_REGNO(N) (((N) < 2) ? (N) + 4 : INVALID_REGNUM)
