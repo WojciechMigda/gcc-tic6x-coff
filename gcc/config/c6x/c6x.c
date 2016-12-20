@@ -390,6 +390,7 @@ c6x_file_start (void)
   done_cfi_sections = false;
   default_file_start ();
 
+#ifndef OBJECT_FORMAT_HYBRID
   /* Arrays are aligned to 8-byte boundaries.  */
   asm_fprintf (asm_out_file,
 	       "\t.c6xabi_attribute Tag_ABI_array_object_alignment, 0\n");
@@ -411,6 +412,14 @@ c6x_file_start (void)
   asm_fprintf (asm_out_file,
 	       "\t.c6xabi_attribute Tag_ABI_conformance, \"1.0\"\n");
 
+#else
+  asm_fprintf (asm_out_file,
+           "\t.battr \"TI\", Tag_File, 1, Tag_ABI_stack_align_needed(0)\n");
+  asm_fprintf (asm_out_file,
+           "\t.battr \"TI\", Tag_File, 1, Tag_ABI_stack_align_preserved(0)\n");
+  asm_fprintf (asm_out_file,
+           "\t.battr \"TI\", Tag_File, 1, Tag_Tramps_Use_SOC(1)\n");
+#endif
 }
 
 /* The LTO frontend only enables exceptions when it sees a function that
