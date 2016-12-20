@@ -41,6 +41,17 @@
 #undef TYPE_ASM_OP
 #define ASM_OUTPUT_TYPE_DIRECTIVE(STREAM, NAME, TYPE) HOOK_NOOP
 
+//#undef ASM_WEAKEN_LABEL
+
+#undef ASM_OUTPUT_EXTERNAL
+#define ASM_OUTPUT_EXTERNAL(FILE, DECL, NAME) \
+  do { \
+    c6x_coff_asm_output_external (FILE, DECL, NAME); \
+  } while(0)
+
+void
+c6x_coff_asm_output_external (FILE *file, tree decl, const char *name);
+
 #endif /* OBJECT_FORMAT_HYBRID */
 
 /* Feature bit definitions that enable specific insns.  */

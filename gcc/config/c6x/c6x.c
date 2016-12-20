@@ -6850,3 +6850,23 @@ c6x_debug_unwind_info (void)
 struct gcc_target targetm = TARGET_INITIALIZER;
 
 #include "gt-c6x.h"
+
+#ifdef OBJECT_FORMAT_HYBRID
+
+void
+c6x_coff_asm_output_external (FILE *file, tree decl, const char *name)
+{
+  /* We output the name if and only if TREE_SYMBOL_REFERENCED is
+     set in order to avoid putting out names that are never really
+     used. */
+  if (TREE_SYMBOL_REFERENCED (DECL_ASSEMBLER_NAME (decl))
+      && !targetm.binds_local_p (decl))
+  {
+    fprintf(file, "\t.ref\t");
+    assemble_name(file, name);
+    fprintf(file, "\n");
+  }
+}
+
+#endif /* OBJECT_FORMAT_HYBRID */
+
