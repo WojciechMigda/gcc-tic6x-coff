@@ -26,8 +26,20 @@
 
 #ifdef OBJECT_FORMAT_HYBRID
 
+#undef TARGET_ASM_OUTPUT_IDENT
+#define TARGET_ASM_OUTPUT_IDENT hook_void_constcharptr
+
 #undef COMMON_ASM_OP
 #define COMMON_ASM_OP   ".far"
+
+#define HOOK_NOOP do {} while(0)
+
+#undef SIZE_ASM_OP
+#define ASM_OUTPUT_SIZE_DIRECTIVE(STREAM, NAME, SIZE) HOOK_NOOP
+#define ASM_OUTPUT_MEASURED_SIZE(STREAM, NAME) HOOK_NOOP
+
+#undef TYPE_ASM_OP
+#define ASM_OUTPUT_TYPE_DIRECTIVE(STREAM, NAME, TYPE) HOOK_NOOP
 
 #endif /* OBJECT_FORMAT_HYBRID */
 
@@ -488,29 +500,11 @@ struct GTY(()) machine_function
     }								\
   while (0)
 
-#ifdef OBJECT_FORMAT_HYBRID
-
-static inline void noop_asm_output_ident_directive (const char *ident_str ATTRIBUTE_UNUSED){}
-
-/* .ident */
-#undef TARGET_ASM_OUTPUT_IDENT
-#define TARGET_ASM_OUTPUT_IDENT noop_asm_output_ident_directive
-
-/* .type */
-#undef ASM_OUTPUT_TYPE_DIRECTIVE
-#define ASM_OUTPUT_TYPE_DIRECTIVE(STREAM, NAME, TYPE)
-
-#endif
-
 /* This should be the same as the definition in elfos.h, plus the call
    to output special unwinding directives.  */
 #undef ASM_DECLARE_FUNCTION_SIZE
-#ifndef OBJECT_FORMAT_HYBRID
 #define ASM_DECLARE_FUNCTION_SIZE(STREAM, NAME, DECL) \
   c6x_function_end (STREAM, NAME)
-#else
-#define ASM_DECLARE_FUNCTION_SIZE(STREAM, NAME, DECL)
-#endif
 
 /* Arbitrarily choose A4/A5.  */
 #define EH_RETURN_DATA_REGNO(N) (((N) < 2) ? (N) + 4 : INVALID_REGNUM)
