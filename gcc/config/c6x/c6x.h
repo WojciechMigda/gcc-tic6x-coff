@@ -24,6 +24,13 @@
 
 #define OBJECT_FORMAT_HYBRID
 
+#ifdef OBJECT_FORMAT_HYBRID
+
+#undef COMMON_ASM_OP
+#define COMMON_ASM_OP   ".far"
+
+#endif /* OBJECT_FORMAT_HYBRID */
+
 /* Feature bit definitions that enable specific insns.  */
 #define C6X_INSNS_C62X		1
 #define C6X_INSNS_C64X		2
@@ -571,9 +578,14 @@ do { char __buf[256];					\
    : c6x_sdata_mode == C6X_SDATA_ALL ? true	\
    : !AGGREGATE_TYPE_P (TREE_TYPE (EXP)))
 
-#define SCOMMON_ASM_OP "\t.scomm\t"
+#ifndef OBJECT_FORMAT_HYBRID
+  #define SCOMMON_ASM_OP "\t.scomm\t"
+#else
+  #define SCOMMON_ASM_OP "\t.bss\t"
+#endif
 
 #undef  ASM_OUTPUT_ALIGNED_DECL_COMMON
+#ifndef OBJECT_FORMAT_HYBRID
 #define ASM_OUTPUT_ALIGNED_DECL_COMMON(FILE, DECL, NAME, SIZE, ALIGN)	\
   do									\
     {									\
@@ -585,6 +597,27 @@ do { char __buf[256];					\
       fprintf ((FILE), ",%u,%u\n", (int)(SIZE), (ALIGN) / BITS_PER_UNIT);\
     }									\
   while (0)
+#else
+#define ASM_OUTPUT_ALIGNED_DECL_COMMON(FILE, DECL, NAME, SIZE, ALIGN)	\
+  do									\
+    {									\
+      fprintf ((FILE), GLOBAL_ASM_OP);\
+      assemble_name ((FILE), (NAME));                   \
+      fprintf ((FILE), "\n");				\
+      if (DECL != NULL && PLACE_IN_SDATA_P (DECL))			\
+      { \
+          fprintf ((FILE), "%s", SCOMMON_ASM_OP);				\
+          assemble_name ((FILE), (NAME));                   \
+      } \
+      else								\
+      { \
+          assemble_name ((FILE), (NAME));                   \
+          fprintf ((FILE), ":\t.usect\t\"%s\"", COMMON_ASM_OP);             \
+      } \
+      fprintf ((FILE), ",%u,%u\n", (int)(SIZE), (ALIGN) / BITS_PER_UNIT);\
+    }									\
+  while (0)
+#endif /* OBJECT_FORMAT_HYBRID */
 
 /* This says how to output assembler code to declare an
    uninitialized internal linkage data object.  */
